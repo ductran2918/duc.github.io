@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>US Founders Map</title>
+  <!-- ==== Change this so your browser tab shows the right title ==== -->
+  <title>Map of SEA founders in the US</title>
 
   <!-- Leaflet CSS -->
   <link
@@ -27,41 +28,35 @@
       padding: 1em;
       font-family: Arial, sans-serif;
     }
-    /* Dim background */
     dialog#detailModal::backdrop {
       background: rgba(0, 0, 0, 0.4);
     }
-
-    /* Scrollable content */
     #modalContent {
       max-height: 70vh;
       overflow-y: auto;
       margin-top: 1em;
     }
-
-    /* Table styling */
     table {
       width: 100%;
       border-collapse: collapse;
     }
-    th,
-    td {
+    th, td {
       border: 1px solid #ccc;
       padding: 4px;
       text-align: left;
     }
-
-    /* Close button */
     button#closeModal {
       float: right;
     }
   </style>
 </head>
 <body>
-  <!-- Map container -->
+    <h1 style="text-align: center; font-family: Arial, sans-serif; margin: 1em 0;">
+    Map of SEA founders in the US
+    </h1>
+
   <div id="map"></div>
 
-  <!-- Detail modal -->
   <dialog id="detailModal">
     <button id="closeModal">Close</button>
     <div id="modalContent"></div>
@@ -73,135 +68,129 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <script>
-    // Initialize Leaflet with no zoom/pan controls
+    // 1. Initialize map
     const map = L.map("map", {
       zoomControl: false,
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
       boxZoom: false,
-      keyboard: false,
+      keyboard: false
     }).setView([37.8, -96], 4);
 
-    // Restrict view to US bounds
-    map.setMaxBounds([
-      [20, -140],  // SW corner
-      [55, -50]    // NE corner
-    ]);
+    // lock bounds to contiguous US
+    map.setMaxBounds([[20, -140], [55, -50]]);
 
-    // Store founders by state
+    // 2. Load and group CSV
     const stateData = {};
-
-    // Load CSV and group by state
-    Papa.parse("data_seafounders_us.csv", {
+    Papa.parse("SEA Founders in US.csv", {
       download: true,
       header: true,
       complete: ({ data }) => {
-        data.forEach((d) => {
+        console.log("✅ CSV loaded:", data.length, "rows");
+        data.forEach(d => {
           const st = d.state;
           if (!stateData[st]) stateData[st] = [];
           stateData[st].push(d);
         });
         drawMap();
+      },
+      error: err => {
+        console.error("❌ CSV load error:", err);
+        alert("CSV load error: " + err.message);
       }
     });
 
     function drawMap() {
-      // Compute equal‑interval breaks
-      const counts = Object.values(stateData).map(arr => arr.length);
+      // 3. Compute equal‑interval breaks
+      const counts = Object.values(stateData).map(a => a.length);
       counts.push(0);
-      const maxCount = d3.max(counts);
-      const minCount = d3.min(counts);
-      const interval = (maxCount - minCount) / 5;
-      const breaks = d3.range(1, 6).map(i => minCount + i * interval);
-
-      // D3 5‑step blues
+      const maxC = d3.max(counts), minC = d3.min(counts);
+      const interval = (maxC - minC) / 5;
+      const breaks = d3.range(1,6).map(i => minC + i * interval);
       const palette = d3.schemeBlues[5];
 
-      function getColor(count) {
+      function getColor(c) {
         for (let i = 0; i < breaks.length; i++) {
-          if (count <= breaks[i]) return palette[i];
+          if (c <= breaks[i]) return palette[i];
         }
-        return palette[palette.length - 1];
+        return palette[4];
       }
 
-      // Fetch US states GeoJSON (lower 48 + HI)
-      fetch("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json")
-        .then(res => res.json())
+      // 4. Fetch GeoJSON via jsDelivr
+      const GEOJSON_URL = 
+        "https://cdn.jsdelivr.net/gh/PublicaMundi/MappingAPI@master/data/geojson/us-states.json";
+
+      fetch(GEOJSON_URL)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
         .then(geojson => {
+          console.log("✅ GeoJSON loaded:", geojson.features.length, "features");
           L.geoJson(geojson, {
             filter: f => f.properties.name !== "Alaska",
-            style: feature => {
-              const name = feature.properties.name;
-              const cnt = (stateData[name] || []).length;
+            style: feat => {
+              const name = feat.properties.name;
+              const c = (stateData[name] || []).length;
               return {
                 color: "#fff",
                 weight: 1,
                 fillOpacity: 1,
-                fillColor: cnt > 0 ? getColor(cnt) : "#e5f5f9"
+                fillColor: c > 0 ? getColor(c) : "#e5f5f9"
               };
             },
-            onEachFeature: (feature, layer) => {
-              const name = feature.properties.name;
-              const cnt = (stateData[name] || []).length;
-              const tooltipText = cnt > 0
-                ? `${name}: ${cnt} founders<br>Click to see details`
+            onEachFeature: (feat, layer) => {
+              const name = feat.properties.name;
+              const c = (stateData[name] || []).length;
+              const tip = c > 0
+                ? `${name}: ${c} founders<br>Click to see details`
                 : `${name}: N/A`;
 
               layer.on("mouseover", e => {
-                layer.bindTooltip(tooltipText, { sticky: true, direction: "auto" })
-                     .openTooltip(e.latlng);
+                layer.bindTooltip(tip, { sticky: true }).openTooltip(e.latlng);
               });
-              layer.on("mouseout", () => {
-                layer.closeTooltip();
-              });
+              layer.on("mouseout", () => layer.closeTooltip());
 
-              if (cnt > 0) {
+              if (c > 0) {
+                const el = layer.getElement && layer.getElement();
+                if (el) el.style.cursor = "pointer";
                 layer.on("click", () => showModal(name));
-                layer.getElement().style.cursor = "pointer";
               }
             }
           }).addTo(map);
+        })
+        .catch(err => {
+          console.error("❌ GeoJSON load error:", err);
+          alert("Map data error:\n" + err.message);
         });
     }
 
-    // Modal handling
+    // 5. Modal logic
     const modal = document.getElementById("detailModal");
-    const modalContent = document.getElementById("modalContent");
-    document.getElementById("closeModal").addEventListener("click", () => {
-      modal.close();
-    });
+    const content = document.getElementById("modalContent");
+    document.getElementById("closeModal").onclick = () => modal.close();
 
-    // Build and show detail table
-    function showModal(stateName) {
-      const list = stateData[stateName] || [];
-      let html = `<h3>Founders in ${stateName} (${list.length})</h3>`;
-      html += `
-        <table>
-          <thead>
-            <tr>
-              <th>Founder</th>
-              <th>State</th>
-              <th>Company</th>
-              <th>Founded Year</th>
-              <th>Vertical</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
+    function showModal(state) {
+      const list = stateData[state] || [];
+      let html = `<h3>Founders in ${state} (${list.length})</h3>`;
+      html += `<table>
+        <thead><tr>
+          <th>Founder</th><th>State</th>
+          <th>Company</th><th>Founded Year</th>
+          <th>Vertical</th>
+        </tr></thead><tbody>`;
       list.forEach(d => {
-        html += `
-          <tr>
-            <td>${d.founder}</td>
-            <td>${d.state}</td>
-            <td>${d.company}</td>
-            <td>${d.founded_year}</td>
-            <td>${d.vertical}</td>
-          </tr>
-        `;
+        html += `<tr>
+          <td>${d.founder}</td>
+          <td>${d.state}</td>
+          <td>${d.company}</td>
+          <td>${d.founded_year}</td>
+          <td>${d.vertical}</td>
+        </tr>`;
       });
       html += `</tbody></table>`;
-      modalContent.innerHTML = html;
+      content.innerHTML = html;
       modal.showModal();
     }
   </script>
