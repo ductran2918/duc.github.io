@@ -13,9 +13,27 @@
 
   <style>
     /* Full‑width map */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    h1 {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      margin: 1em 0 0.25em;
+    }
+
     #map {
-      height: 600px;
       width: 100%;
+      height: 450px;
+      margin: 0;
+      background-color: transparent;
     }
 
     /* Modal styles */
@@ -54,6 +72,10 @@
     <h1 style="text-align: center; font-family: Arial, sans-serif; margin: 1em 0;">
     Map of SEA founders in the US
     </h1>
+    <h3 style="text-align: center; font-family: Arial;
+    font-weight: normal; sans-serif; margin: 1em 0;">
+    Hover on states to see details
+    </h3>
 
   <div id="map"></div>
 
@@ -70,13 +92,15 @@
   <script>
     // 1. Initialize map
     const map = L.map("map", {
-      zoomControl: false,
+      zoomControl: true,
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
       boxZoom: false,
       keyboard: false
     }).setView([37.8, -96], 4);
+    map.zoomControl.setPosition("bottomright");
+      
 
     // lock bounds to contiguous US
     map.setMaxBounds([[20, -140], [55, -50]]);
@@ -129,7 +153,8 @@
         .then(geojson => {
           console.log("✅ GeoJSON loaded:", geojson.features.length, "features");
           L.geoJson(geojson, {
-            filter: f => f.properties.name !== "Alaska",
+            filter: f => 
+            !["Alaska", "Hawaii", "Puerto Rico"].includes(f.properties.name),
             style: feat => {
               const name = feat.properties.name;
               const c = (stateData[name] || []).length;
@@ -181,14 +206,21 @@
           <th>Vertical</th>
         </tr></thead><tbody>`;
       list.forEach(d => {
-        html += `<tr>
-          <td>${d.founder}</td>
-          <td>${d.state}</td>
-          <td>${d.company}</td>
-          <td>${d.founded_year}</td>
-          <td>${d.vertical}</td>
-        </tr>`;
-      });
+          // Convert Markdown [Name](URL) into an <a> tag
+        let founderHtml = d.founder.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        '<a href="$2" target="_blank">$1</a>'
+        );
+
+        html += `
+          <tr>
+            <td>${founderHtml}</td>
+            <td>${d.state}</td>
+            <td>${d.company}</td>
+            <td>${d.founded_year}</td>
+            <td>${d.vertical}</td>
+          </tr>`;
+        });
       html += `</tbody></table>`;
       content.innerHTML = html;
       modal.showModal();
