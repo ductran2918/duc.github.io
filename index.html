@@ -25,6 +25,7 @@
       border-radius: 5px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
       padding: 1em;
+      font-family: Arial, sans-serif;
     }
     /* Dim background */
     dialog#detailModal::backdrop {
@@ -72,24 +73,31 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <script>
-    // Initialize the Leaflet map
-    const map = L.map("map").setView([37.8, -96], 4);
+    // Initialize Leaflet with no zoom/pan controls
+    const map = L.map("map", {
+      zoomControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+    }).setView([37.8, -96], 4);
 
-    // (Optional) Add an OpenStreetMap tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
+    // Restrict view to US bounds
+    map.setMaxBounds([
+      [20, -140],  // SW corner
+      [55, -50]    // NE corner
+    ]);
 
     // Store founders by state
     const stateData = {};
 
-    // Load and parse the CSV
+    // Load CSV and group by state
     Papa.parse("data_seafounders_us.csv", {
       download: true,
       header: true,
-      complete: function (results) {
-        // Group rows by state
-        results.data.forEach((d) => {
+      complete: ({ data }) => {
+        data.forEach((d) => {
           const st = d.state;
           if (!stateData[st]) stateData[st] = [];
           stateData[st].push(d);
@@ -99,18 +107,17 @@
     });
 
     function drawMap() {
-      // Build an array of counts (include zero)
-      const counts = Object.values(stateData).map((arr) => arr.length);
+      // Compute equal‑interval breaks
+      const counts = Object.values(stateData).map(arr => arr.length);
       counts.push(0);
       const maxCount = d3.max(counts);
       const minCount = d3.min(counts);
       const interval = (maxCount - minCount) / 5;
-      const breaks = d3.range(1, 6).map((i) => minCount + i * interval);
+      const breaks = d3.range(1, 6).map(i => minCount + i * interval);
 
-      // Five‑step blue palette from D3
+      // D3 5‑step blues
       const palette = d3.schemeBlues[5];
 
-      // Color helper
       function getColor(count) {
         for (let i = 0; i < breaks.length; i++) {
           if (count <= breaks[i]) return palette[i];
@@ -119,42 +126,40 @@
       }
 
       // Fetch US states GeoJSON (lower 48 + HI)
-      fetch(
-        "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json"
-      )
-        .then((res) => res.json())
-        .then((geojson) => {
+      fetch("https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json")
+        .then(res => res.json())
+        .then(geojson => {
           L.geoJson(geojson, {
-            // Exclude Alaska
-            filter: (f) => f.properties.name !== "Alaska",
-            style: (feature) => {
-              const c = (stateData[feature.properties.name] || []).length;
+            filter: f => f.properties.name !== "Alaska",
+            style: feature => {
+              const name = feature.properties.name;
+              const cnt = (stateData[name] || []).length;
               return {
                 color: "#fff",
                 weight: 1,
-                fillOpacity: 0.7,
-                fillColor: getColor(c)
+                fillOpacity: 1,
+                fillColor: cnt > 0 ? getColor(cnt) : "#e5f5f9"
               };
             },
             onEachFeature: (feature, layer) => {
               const name = feature.properties.name;
               const cnt = (stateData[name] || []).length;
+              const tooltipText = cnt > 0
+                ? `${name}: ${cnt} founders<br>Click to see details`
+                : `${name}: N/A`;
 
-              // Hover tooltip
-              layer.on("mouseover", (e) => {
-                layer
-                  .bindTooltip(
-                    `${cnt} founders – Click to see details`,
-                    { sticky: true }
-                  )
-                  .openTooltip(e.latlng);
+              layer.on("mouseover", e => {
+                layer.bindTooltip(tooltipText, { sticky: true, direction: "auto" })
+                     .openTooltip(e.latlng);
               });
               layer.on("mouseout", () => {
                 layer.closeTooltip();
               });
 
-              // Click: show modal
-              layer.on("click", () => showModal(name));
+              if (cnt > 0) {
+                layer.on("click", () => showModal(name));
+                layer.getElement().style.cursor = "pointer";
+              }
             }
           }).addTo(map);
         });
@@ -167,22 +172,35 @@
       modal.close();
     });
 
-    // Build and show the detail table
+    // Build and show detail table
     function showModal(stateName) {
       const list = stateData[stateName] || [];
       let html = `<h3>Founders in ${stateName} (${list.length})</h3>`;
-      html +=
-        "<table><thead><tr><th>Founder</th><th>State</th><th>Company</th><th>Founded Year</th><th>Vertical</th></tr></thead><tbody>";
-      list.forEach((d) => {
-        html += `<tr>
-          <td>${d.founder}</td>
-          <td>${d.state}</td>
-          <td>${d.company}</td>
-          <td>${d.founded_year}</td>
-          <td>${d.vertical}</td>
-        </tr>`;
+      html += `
+        <table>
+          <thead>
+            <tr>
+              <th>Founder</th>
+              <th>State</th>
+              <th>Company</th>
+              <th>Founded Year</th>
+              <th>Vertical</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      list.forEach(d => {
+        html += `
+          <tr>
+            <td>${d.founder}</td>
+            <td>${d.state}</td>
+            <td>${d.company}</td>
+            <td>${d.founded_year}</td>
+            <td>${d.vertical}</td>
+          </tr>
+        `;
       });
-      html += "</tbody></table>";
+      html += `</tbody></table>`;
       modalContent.innerHTML = html;
       modal.showModal();
     }
