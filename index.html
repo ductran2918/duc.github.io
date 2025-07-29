@@ -165,7 +165,7 @@
 
     // 2. Load and group CSV
     const stateData = {};
-    Papa.parse("sea_founders_in_us_29jul_updated.csv", {
+    Papa.parse("https://docs.google.com/spreadsheets/d/e/2PACX-1vRSzWOs1JqYD8zPv4JbMHtVaOiKUVKT1WoRAhgEozC5SLDw6iw8zzbfEwFGl4ETSQ9PN2IIe38xgC9g/pub?gid=1392287358&single=true&output=csv", {
       download: true,
       header: true,
       complete: ({ data }) => {
