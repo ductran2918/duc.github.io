@@ -103,7 +103,7 @@
     .legend-bar {
       height: 20px;
       width: 100%;
-      background: linear-gradient(to right, #f7fbff, #deebf7, #c6dbef, #9ecae1, #6baed6);  /* Blues from lightest to darkest */
+      background: linear-gradient(to right, #eff3ff, #bdd7e7, #6baed6, #3182bd, #08519c);  /* Updated color sequence */
       margin: 5px 0;
     }
     .legend-labels {
@@ -123,6 +123,36 @@
       font-weight: bold;
       margin-bottom: 5px;
     }
+
+    .state-selector {
+      text-align: center;
+      margin: 1em 0;
+    }
+    .state-selector select {
+      padding: 0.5em;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    #stateSelect {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 200px;
+      background-color: white;
+      cursor: pointer;
+    }
+
+    #stateSelect:focus {
+      outline: none;
+      border-color: #3182bd;
+    }
   </style>
 </head>
 <body>
@@ -131,8 +161,14 @@
     </h1>
     <h3 style="text-align: center; font-family: Arial;
     font-weight: normal; sans-serif; margin: 1em 0;">
-    Hover on states to see details
+    Hover and click on states to see details list of founders
     </h3>
+
+    <div class="state-selector">
+      <select id="stateSelect" aria-label="Select a state">
+        <option value="">Select a state...</option>
+      </select>
+    </div>
 
   <div class="legend" id="legend"></div>
   <div id="map"></div>
@@ -210,7 +246,8 @@
       const maxC = d3.max(counts), minC = d3.min(counts);
       const interval = (maxC - minC) / 5;
       const breaks = d3.range(1,6).map(i => minC + i * interval);
-      const palette = d3.schemeBlues[5];
+      // Replace d3.schemeBlues with custom palette
+      const palette = ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'];
       
       createLegend(breaks, palette); // Add this line after defining breaks and palette
 
@@ -264,6 +301,53 @@
               }
             }
           }).addTo(map);
+
+          // Add this in your drawMap function, after the L.geoJson initialization
+          function populateStateDropdown(geojson) {
+            const select = document.getElementById('stateSelect');
+            
+            // Create array of state objects with their founder counts
+            const states = geojson.features
+              .filter(f => !["Alaska", "Hawaii", "Puerto Rico"].includes(f.properties.name))
+              .map(f => {
+                const name = f.properties.name;
+                const count = (stateData[name] || []).length;
+                return {
+                  name: name,
+                  count: count,
+                  display: count > 0 ? `${name}: ${count} founders` : `${name}: N/A`
+                };
+              })
+              // Sort by count in descending order, putting N/A states at the bottom
+              .sort((a, b) => {
+                if (a.count === 0 && b.count === 0) return a.name.localeCompare(b.name);
+                if (a.count === 0) return 1;
+                if (b.count === 0) return -1;
+                return b.count - a.count;
+              });
+
+            // Update default option
+            select.querySelector('option').textContent = 'Select a state...';
+
+            // Add state options
+            states.forEach(state => {
+              const option = document.createElement('option');
+              option.value = state.name;
+              option.textContent = state.display;
+              select.appendChild(option);
+            });
+
+            // Keep existing event listener
+            select.addEventListener('change', (e) => {
+              const selectedState = e.target.value;
+              if (selectedState && stateData[selectedState]?.length > 0) {
+                showModal(selectedState);
+              }
+            });
+          }
+
+          // Add this line in your .then() block after creating the L.geoJson layer
+          populateStateDropdown(geojson);
         })
         .catch(err => {
           console.error("❌ GeoJSON load error:", err);
