@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <!-- ==== Change this so your browser tab shows the right title ==== -->
   <title>Map of SEA founders in the US</title>
 
@@ -31,15 +32,15 @@
 
     #map {
       width: 100%;
-      height: 450px;
+      height: 65vh;  /* Changed from fixed 450px to responsive 65vh */
       margin: 0;
       background-color: transparent;
     }
 
     /* Modal styles */
     dialog#detailModal {
-      width: 80%;
-      max-width: 600px;
+      width: 90%;  /* Increased from 80% to 90% */
+      max-width: 1200px;  /* Increased from 600px to 1200px */
       border: none;
       border-radius: 5px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
@@ -52,7 +53,8 @@
     #modalContent {
       max-height: 70vh;
       overflow-y: auto;
-      margin-top: 1em;
+      margin-top: 0.5em;  /* Reduced from 1em to give more space for content */
+      padding-right: 20px;  /* Add some padding to prevent content from going under button */
     }
     table {
       width: 100%;
@@ -60,11 +62,66 @@
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 4px;
+      padding: 6px 8px;
       text-align: left;
+      font-size: 14px;  /* Slightly smaller font size */
+      white-space: nowrap;  /* Prevent text wrapping */
     }
     button#closeModal {
-      float: right;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    button#closeModal:hover {
+      background: #e0e0e0;
+    }
+
+    .legend {
+      padding: 6px 8px;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      margin: 0 auto 10px auto;  /* Changed margin to center horizontally */
+      width: 300px;
+      display: block;  /* Added to ensure centering works */
+      position: relative;  /* Added for positioning context */
+      text-align: center;  /* Center the text content */
+    }
+    .legend-bar {
+      height: 20px;
+      width: 100%;
+      background: linear-gradient(to right, #f7fbff, #deebf7, #c6dbef, #9ecae1, #6baed6);  /* Blues from lightest to darkest */
+      margin: 5px 0;
+    }
+    .legend-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+    .legend-title {
+      font-weight: bold;
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -77,10 +134,11 @@
     Hover on states to see details
     </h3>
 
+  <div class="legend" id="legend"></div>
   <div id="map"></div>
 
   <dialog id="detailModal">
-    <button id="closeModal">Close</button>
+    <button id="closeModal">✕</button>  <!-- Changed from "Close" to "✕" -->
     <div id="modalContent"></div>
   </dialog>
 
@@ -98,7 +156,7 @@
       doubleClickZoom: false,
       boxZoom: false,
       keyboard: false
-    }).setView([37.8, -96], 4);
+    }).setView([37.8, -96], window.innerWidth < 500 ? 3 : 4);  // Adjust zoom level for mobile
     map.zoomControl.setPosition("bottomright");
       
 
@@ -107,13 +165,14 @@
 
     // 2. Load and group CSV
     const stateData = {};
-    Papa.parse("SEA Founders in US.csv", {
+    Papa.parse("sea_founders_in_us_29jul_updated.csv", {
       download: true,
       header: true,
       complete: ({ data }) => {
-        console.log("✅ CSV loaded:", data.length, "rows");
+        console.log("First row of data:", data[0]); // Add this line
+        console.log("Column names:", Object.keys(data[0])); // Add this line
         data.forEach(d => {
-          const st = d.state;
+          const st = d.com_state;
           if (!stateData[st]) stateData[st] = [];
           stateData[st].push(d);
         });
@@ -125,6 +184,25 @@
       }
     });
 
+    function createLegend(breaks, palette) {
+      const legend = document.getElementById('legend');
+      let html = '<div class="legend-title">Number of founders</div>';
+      
+      // Add the gradient bar
+      html += '<div class="legend-bar"></div>';
+      
+      // Add labels
+      html += '<div class="legend-labels">';
+      html += `<span>1</span>
+              <span>11</span>
+              <span>21</span>
+              <span>31</span>
+              <span>41</span>`;
+      html += '</div>';
+      
+      legend.innerHTML = html;
+    }
+
     function drawMap() {
       // 3. Compute equal‑interval breaks
       const counts = Object.values(stateData).map(a => a.length);
@@ -133,6 +211,8 @@
       const interval = (maxC - minC) / 5;
       const breaks = d3.range(1,6).map(i => minC + i * interval);
       const palette = d3.schemeBlues[5];
+      
+      createLegend(breaks, palette); // Add this line after defining breaks and palette
 
       function getColor(c) {
         for (let i = 0; i < breaks.length; i++) {
@@ -162,15 +242,15 @@
                 color: "#fff",
                 weight: 1,
                 fillOpacity: 1,
-                fillColor: c > 0 ? getColor(c) : "#e5f5f9"
+                fillColor: c > 0 ? getColor(c) : "#f0f0f0"  // Change #e5f5f9 to any color you want
               };
             },
             onEachFeature: (feat, layer) => {
               const name = feat.properties.name;
               const c = (stateData[name] || []).length;
               const tip = c > 0
-                ? `${name}: ${c} founders<br>Click to see details`
-                : `${name}: N/A`;
+                ? `<b>${name}</b>: ${c} founders<br>Click to see details`
+                : `<b>${name}</b>: N/A`;
 
               layer.on("mouseover", e => {
                 layer.bindTooltip(tip, { sticky: true }).openTooltip(e.latlng);
@@ -191,36 +271,44 @@
         });
     }
 
-    // 5. Modal logic
+    // 5. Modal logic - Keep only this one showModal function
     const modal = document.getElementById("detailModal");
     const content = document.getElementById("modalContent");
     document.getElementById("closeModal").onclick = () => modal.close();
 
     function showModal(state) {
       const list = stateData[state] || [];
-      let html = `<h3>Founders in ${state} (${list.length})</h3>`;
+      let html = `<h3>${state}: ${list.length} SEA founders</h3>`;
       html += `<table>
         <thead><tr>
-          <th>Founder</th><th>State</th>
-          <th>Company</th><th>Founded Year</th>
-          <th>Vertical</th>
+          <th>Founder</th>
+          <th>City</th>
+          <th>Company</th>
+          <th>Founded Year</th>
+          <th>Industry</th>
+          <th>Country of Origin</th>
         </tr></thead><tbody>`;
       list.forEach(d => {
-          // Convert Markdown [Name](URL) into an <a> tag
+        // Convert Markdown links for founder and company
         let founderHtml = d.founder.replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" target="_blank">$1</a>'
+          /\[([^\]]+)\]\(([^)]+)\)/g,
+          '<a href="$2" target="_blank">$1</a>'
+        );
+        let companyHtml = d.company.replace(
+          /\[([^\]]+)\]\(([^)]+)\)/g,
+          '<a href="$2" target="_blank">$1</a>'
         );
 
         html += `
           <tr>
             <td>${founderHtml}</td>
-            <td>${d.state}</td>
-            <td>${d.company}</td>
-            <td>${d.founded_year}</td>
-            <td>${d.vertical}</td>
+            <td>${d.com_city}</td>
+            <td>${companyHtml}</td>
+            <td>${d.com_year}</td>
+            <td>${d.com_industry}</td>
+            <td>${d.origin}</td>
           </tr>`;
-        });
+      });
       html += `</tbody></table>`;
       content.innerHTML = html;
       modal.showModal();
