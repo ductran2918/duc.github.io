@@ -47,6 +47,246 @@
       padding: 1em;
       font-family: Arial, sans-serif;
     }
+
+    /* Mobile-specific modal styles */
+    @media (max-width: 600px) {
+      dialog#detailModal {
+        width: 90vw;
+        height: calc(80vh - 15vh);
+        max-width: none;
+        max-height: none;
+        padding: 3vh 3vw;
+        position: fixed;
+        top: 15vh;
+        left: 5vw;
+        right: 5vw;
+        bottom: 20vh;
+        transform: none;
+        margin: 0;
+        border-radius: 8px;
+      }
+      
+      #modalContent {
+        height: calc(80vh - 15vh - 6vh);
+        max-height: calc(80vh - 15vh - 6vh);
+        overflow: hidden;
+        padding-right: 2vw;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Ensure close button is visible */
+      button#closeModal {
+        width: 6vw;
+        height: 6vw;
+        min-width: 24px;
+        min-height: 24px;
+        right: 2vw;
+        top: 2vh;
+        font-size: clamp(12px, 3vw, 16px);
+      }
+    }
+
+    /* Mobile card layout */
+    .mobile-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .mobile-header {
+      font-weight: bold;
+      text-align: left;
+      height: 12%;
+      padding-top: 5%;
+      padding-bottom: 2%;
+      border-bottom: 1px solid #ccc;
+      flex-shrink: 0;
+      font-size: clamp(14px, 4vw, 18px);
+      line-height: 1.2;
+      display: flex;
+      align-items: flex-start;
+      box-sizing: border-box;
+    }
+    
+    .mobile-content {
+      height: 75%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .cards-container {
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .founder-card {
+      height: 33.333%;
+      padding: 2% 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      box-sizing: border-box;
+    }
+    
+    .founder-card:not(:last-child) {
+      border-bottom: 1px solid #ccc;
+    }
+    
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5vh;
+      min-height: 0;
+      flex: 1;
+    }
+    
+    .card-left {
+      flex: 1;
+      text-align: left;
+      padding-right: 2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .card-right {
+      flex: 1;
+      text-align: right;
+      padding-left: 2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .card-label {
+      font-weight: bold;
+      font-size: clamp(9px, 2.5vw, 11px);
+      color: #666;
+      margin-bottom: 0.2vh;
+      line-height: 1.1;
+    }
+    
+    .card-value {
+      font-size: clamp(10px, 2.8vw, 13px);
+      color: #333;
+      word-break: break-word;
+      line-height: 1.2;
+    }
+    
+    .pagination {
+      height: 13%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4vw;
+      flex-shrink: 0;
+      padding-top: 1vh;
+      border-top: 1px solid #eee;
+      box-sizing: border-box;
+    }
+    
+    .pagination button {
+      padding: 2vh 4vw;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: clamp(12px, 3.5vw, 14px);
+      min-width: 15vw;
+      min-height: 8vh;
+      touch-action: manipulation;
+    }
+    
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .pagination button:hover:not(:disabled) {
+      background: #f0f0f0;
+    }
+    
+    .page-info {
+      font-size: clamp(12px, 3.5vw, 14px);
+      color: #666;
+      min-width: 10vw;
+      text-align: center;
+    }
+
+    /* Additional mobile optimizations for smaller screens */
+    @media (max-width: 400px) {
+      dialog#detailModal {
+        padding: 2vh 2vw;
+        height: calc(80vh - 15vh);
+        left: 5vw;
+        right: 5vw;
+        bottom: 20vh;
+      }
+      
+      #modalContent {
+        height: calc(80vh - 15vh - 4vh);
+        max-height: calc(80vh - 15vh - 4vh);
+        padding-right: 1vw;
+      }
+      
+      .mobile-header {
+        height: 12%;
+        padding-top: 5%;
+        padding-bottom: 1.5%;
+        font-size: clamp(13px, 4.2vw, 17px);
+      }
+      
+      .mobile-content {
+        height: 75%;
+      }
+      
+      .founder-card {
+        height: 33.333%;
+        padding: 1.5% 0;
+      }
+      
+      .card-row {
+        margin-bottom: 0.3vh;
+      }
+      
+      .card-label {
+        font-size: clamp(8px, 2.8vw, 10px);
+        margin-bottom: 0.1vh;
+      }
+      
+      .card-value {
+        font-size: clamp(9px, 3vw, 12px);
+      }
+      
+      .pagination {
+        height: 13%;
+        padding-top: 0.5vh;
+      }
+      
+      .pagination button {
+        padding: 1.5vh 3vw;
+        font-size: clamp(10px, 3vw, 13px);
+        min-width: 12vw;
+        min-height: 5vh;
+      }
+      
+      .page-info {
+        font-size: clamp(10px, 3vw, 13px);
+      }
+
+      button#closeModal {
+        width: 7vw;
+        height: 7vw;
+        font-size: 3.5vw;
+      }
+    }
     dialog#detailModal::backdrop {
       background: rgba(0, 0, 0, 0.4);
     }
@@ -159,8 +399,7 @@
     <h1 style="text-align: center; font-family: Arial, sans-serif; margin: 1em 0;">
     Map of SEA founders in the US
     </h1>
-    <h3 style="text-align: center; font-family: Arial;
-    font-weight: normal; sans-serif; margin: 1em 0;">
+    <h3 style="text-align: center; font-family: Arial, sans-serif; font-weight: normal; margin: 1em 0;">
     Select a state from dropdown menu or click on the map see details list
     </h3>
 
@@ -230,10 +469,11 @@
       // Add labels
       html += '<div class="legend-labels">';
       html += `<span>1</span>
-              <span>11</span>
-              <span>21</span>
-              <span>31</span>
-              <span>41</span>`;
+              <span>10</span>
+              <span>20</span>
+              <span>30</span>
+              <span>40</span>
+              <span>50</span>`;
       html += '</div>';
       
       legend.innerHTML = html;
@@ -360,8 +600,27 @@
     const content = document.getElementById("modalContent");
     document.getElementById("closeModal").onclick = () => modal.close();
 
+    let currentPage = 1;
+    let foundersPerPage = 3;
+    let currentFounders = [];
+
+    function isMobile() {
+      return window.innerWidth < 600;
+    }
+
     function showModal(state) {
       const list = stateData[state] || [];
+      currentFounders = list;
+      currentPage = 1;
+      
+      if (isMobile()) {
+        showMobileModal(state, list);
+      } else {
+        showDesktopModal(state, list);
+      }
+    }
+
+    function showDesktopModal(state, list) {
       let html = `<h3>${state}: ${list.length} SEA founders</h3>`;
       html += `<table>
         <thead><tr>
@@ -397,6 +656,101 @@
       content.innerHTML = html;
       modal.showModal();
     }
+
+    function showMobileModal(state, list) {
+      const totalPages = Math.ceil(list.length / foundersPerPage);
+      const startIndex = (currentPage - 1) * foundersPerPage;
+      const endIndex = startIndex + foundersPerPage;
+      const currentPageFounders = list.slice(startIndex, endIndex);
+
+      let html = `<div class="mobile-layout">`;
+      html += `<div class="mobile-header">${state}: ${list.length} SEA founders</div>`;
+      html += `<div class="mobile-content">`;
+      html += `<div class="cards-container">`;
+      
+      currentPageFounders.forEach((d, index) => {
+        // Convert Markdown links for founder and company
+        let founderHtml = d.founder.replace(
+          /\[([^\]]+)\]\(([^)]+)\)/g,
+          '<a href="$2" target="_blank">$1</a>'
+        );
+        let companyHtml = d.company.replace(
+          /\[([^\]]+)\]\(([^)]+)\)/g,
+          '<a href="$2" target="_blank">$1</a>'
+        );
+
+        html += `<div class="founder-card">
+          <div class="card-row">
+            <div class="card-left">
+              <div class="card-label">Founder</div>
+              <div class="card-value">${founderHtml}</div>
+            </div>
+            <div class="card-right">
+              <div class="card-label">City</div>
+              <div class="card-value">${d.com_city}</div>
+            </div>
+          </div>
+          <div class="card-row">
+            <div class="card-left">
+              <div class="card-label">Company</div>
+              <div class="card-value">${companyHtml}</div>
+            </div>
+            <div class="card-right">
+              <div class="card-label">Year Founded</div>
+              <div class="card-value">${d.com_year}</div>
+            </div>
+          </div>
+          <div class="card-row">
+            <div class="card-left">
+              <div class="card-label">Industry</div>
+              <div class="card-value">${d.com_industry}</div>
+            </div>
+            <div class="card-right">
+              <div class="card-label">Country of Origin</div>
+              <div class="card-value">${d.origin}</div>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      html += `</div>`; // close cards-container
+
+      // Add pagination if needed
+      if (totalPages > 1) {
+        html += `<div class="pagination">
+          <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>Back</button>
+          <span class="page-info">${currentPage}/${totalPages}</span>
+          <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+        </div>`;
+      }
+
+      html += `</div>`; // close mobile-content
+      html += `</div>`; // close mobile-layout
+      content.innerHTML = html;
+      modal.showModal();
+    }
+
+    function changePage(direction) {
+      const totalPages = Math.ceil(currentFounders.length / foundersPerPage);
+      const newPage = currentPage + direction;
+      
+      if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        const state = Object.keys(stateData).find(key => stateData[key] === currentFounders);
+        showMobileModal(state || 'Unknown', currentFounders);
+      }
+    }
+
+    // Add resize listener to handle orientation changes
+    window.addEventListener('resize', () => {
+      if (modal.open) {
+        // Refresh modal if it's currently open and screen size changes
+        const state = Object.keys(stateData).find(key => stateData[key] === currentFounders);
+        if (state) {
+          showModal(state);
+        }
+      }
+    });
   </script>
 </body>
 </html>
