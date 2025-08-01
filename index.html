@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- ==== Change this so your browser tab shows the right title ==== -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <title>Map of SEA founders in the US</title>
 
@@ -16,14 +17,16 @@
     :root {
       --main-font: 'Lato', sans-serif;
     }
+    
     .leaflet-control-attribution {
       display: none !important;
     }
-
     /* Compact content layout */
     html, body {
       margin: 0;
       padding: 0;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     body {
@@ -270,6 +273,28 @@
 
     /* Additional mobile optimizations for smaller screens */
     @media (max-width: 450px) {
+      /* iPhone 14 Pro Max specific optimizations */
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden;
+      }
+      
+      #map {
+        width: 100vw !important;
+        margin: 0 !important;
+        margin-left: calc(-50vw + 50%) !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      
+      .map-footer {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        padding: 0 8px;
+        box-sizing: border-box;
+      }
+      
       dialog#detailModal {
         padding: 2vh 2vw;
         height: calc(80vh - 15vh);
@@ -358,10 +383,6 @@
       .legend {
         margin: 0 auto 0 auto;  /* Remove all margins on very small screens for tight spacing */
         width: 260px;  /* Narrower legend for small screens */
-      }
-
-      #map {
-        margin: 0;  /* Remove all margins to ensure no spacing */
       }
     }
     dialog#detailModal::backdrop {
@@ -472,7 +493,7 @@
 
     #stateSelect:focus {
       outline: none;
-      border-color: #3182bd;
+      border-color: black;
     }
 
     /* Desktop modal header and search styles */
@@ -534,9 +555,17 @@
 
     /* Mobile responsiveness for map footer */
     @media (max-width: 600px) {
+      body {
+        overflow-x: hidden; /* Prevent horizontal scroll */
+      }
+      
       .map-footer {
         align-items: right;
         gap: 0.25em;
+        width: 100vw;   /* Match map width */
+        margin-left: calc(-50vw + 50%); /* Align with map */
+        padding: 0 8px; /* Add padding for content spacing */
+        box-sizing: border-box;
       }
       
       .source-attribution {
@@ -545,7 +574,10 @@
       
       #map {
         height: 350px;  /* Slightly smaller on mobile */
-        margin: 0;  /* Remove all margins */
+        width: 100vw;   /* Use viewport width for true full-width */
+        margin: 0;
+        margin-left: calc(-50vw + 50%); /* Break out of container constraints */
+        position: relative;
       }
 
       .legend {
@@ -565,7 +597,7 @@
 
     <div class="state-selector">
       <select id="stateSelect" aria-label="Select a state">
-        <option value="">Select a state...</option>
+        <option value="">Select a state</option>
       </select>
     </div>
 
@@ -588,7 +620,50 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <script>
-    // 1. Initialize map
+    // Function to determine optimal zoom level and center for different screen sizes
+    function getOptimalMapView() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      // For very small mobile devices (iPhone SE, small Android phones)
+      if (width <= 375) {
+        return {
+          center: [37.8, -96],
+          zoom: 2.8
+        };
+      }
+      // For standard mobile devices (iPhone 14, most modern phones)
+      else if (width <= 430) {
+        return {
+          center: [37.8, -96],
+          zoom: 3.0
+        };
+      }
+      // For larger mobile devices and small tablets
+      else if (width <= 600) {
+        return {
+          center: [37.8, -96],
+          zoom: 3.2
+        };
+      }
+      // For tablets
+      else if (width <= 768) {
+        return {
+          center: [37.8, -96],
+          zoom: 3.5
+        };
+      }
+      // For desktop and larger screens
+      else {
+        return {
+          center: [37.8, -96],
+          zoom: 4
+        };
+      }
+    }
+
+    // 1. Initialize map with responsive zoom
+    const mapView = getOptimalMapView();
     const map = L.map("map", {
       zoomControl: true,
       dragging: false,
@@ -596,7 +671,7 @@
       doubleClickZoom: false,
       boxZoom: false,
       keyboard: false
-    }).setView([37.8, -96], window.innerWidth < 500 ? 3 : 4);  // Adjust zoom level for mobile
+    }).setView(mapView.center, mapView.zoom);
     map.zoomControl.setPosition("bottomright");
       
 
@@ -729,7 +804,7 @@
               .sort((a, b) => b.count - a.count);
 
             // Clear existing options except the placeholder
-            select.innerHTML = '<option value="">Select a state...</option>';
+            select.innerHTML = '<option value="">Select a state</option>';
 
             // Add state options
             states.forEach(state => {
@@ -1046,15 +1121,23 @@
       }
     }
 
-    // Add resize listener to handle orientation changes
+    // Debounced resize handler for better performance
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-      if (modal.open) {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Update map view for new screen size
+        const newMapView = getOptimalMapView();
+        map.setView(newMapView.center, newMapView.zoom);
+        
         // Refresh modal if it's currently open and screen size changes
-        const state = Object.keys(stateData).find(key => stateData[key] === currentFounders);
-        if (state) {
-          showModal(state);
+        if (modal.open) {
+          const state = Object.keys(stateData).find(key => stateData[key] === currentFounders);
+          if (state) {
+            showModal(state);
+          }
         }
-      }
+      }, 250); // 250ms delay to avoid excessive updates
     });
 
     // Add modal close listener to reset dropdown
