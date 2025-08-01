@@ -126,7 +126,7 @@
     .mobile-search-input {
       width: 25vw;
       max-width: 90px;
-      padding: 1vh 2vw;
+      padding: 1vh 1vw;
       font-size: clamp(10px, 2.8vw, 12px);
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -295,8 +295,8 @@
       }
 
       .mobile-search-input {
-        width: 28vw;
-        max-width: 100px;
+        width: 20vw;
+        max-width: 80px;
         padding: 0.8vh 1.5vw;
         font-size: clamp(9px, 2.5vw, 11px);
       }
@@ -353,12 +353,12 @@
 
       /* Additional spacing fixes for small screens */
       .legend {
-        margin: 0.05em auto 0.05em auto;  /* Even tighter spacing on very small screens */
+        margin: 0 auto 0 auto;  /* Remove all margins on very small screens for tight spacing */
         width: 260px;  /* Narrower legend for small screens */
       }
 
       #map {
-        margin-bottom: 0;  /* Ensure no bottom margin */
+        margin: 0;  /* Remove all margins to ensure no spacing */
       }
     }
     dialog#detailModal::backdrop {
@@ -412,7 +412,7 @@
       box-shadow: none;
       border-radius: 5px;
       font-family: var(--main-font);
-      margin: 0 auto 0.25em auto;  /* Minimal margin for compact layout */
+      margin: 0 auto 0 auto;  /* Minimal margin for compact layout */
       width: 300px;
       display: block;
       position: relative;
@@ -542,20 +542,20 @@
       
       #map {
         height: 350px;  /* Slightly smaller on mobile */
-        margin-bottom: 0;  /* Remove any bottom margin */
+        margin: 0;  /* Remove all margins */
       }
 
       .legend {
-        margin: 0.1em auto 0.1em auto;  /* Reduced top and bottom margins on mobile */
+        margin: 0 auto 0 auto;  /* Remove top and bottom margins completely on mobile */
         width: 280px;  /* Slightly narrower on mobile */
       }
     }
   </style>
 </head>
 <body>
-    <h3 style="text-align: center; font-family: var(--main-font); margin: 0.5em 0 0.25em 0;">
+    <h2 style="text-align: center; font-family: var(--main-font); margin: 0.5em 0 0.25em 0;">
     Map of SEA founders in the US
-    </h3>
+    </h2>
     <h4 style="text-align: center; font-family: var(--main-font); font-weight: normal; margin: 0.25em 0;">
     Select a state from dropdown menu or click on the map see details list
     </h4>
