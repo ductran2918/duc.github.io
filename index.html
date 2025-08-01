@@ -26,7 +26,7 @@
     }
     h1 {
       text-align: center;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI' sans-serif;
       margin: 1em 0 0.25em;
     }
 
@@ -45,7 +45,7 @@
       border-radius: 5px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
       padding: 1em;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI' sans-serif;
     }
 
     /* Mobile-specific modal styles */
@@ -98,20 +98,55 @@
     .mobile-header {
       font-weight: bold;
       text-align: left;
-      height: 12%;
-      padding-top: 5%;
-      padding-bottom: 2%;
+      flex-shrink: 0;
+      padding: 2vh 0 1vh 0;
       border-bottom: 1px solid #ccc;
       flex-shrink: 0;
       font-size: clamp(14px, 4vw, 18px);
       line-height: 1.2;
       display: flex;
-      align-items: flex-start;
+      justify-content: space-between;
+      align-items: center;
       box-sizing: border-box;
+    }
+
+    .mobile-header-title {
+      flex: 1;
+      font-size: clamp(14px, 4vw, 18px);
+    }
+
+    .mobile-search-input {
+      width: 30vw;
+      max-width: 120px;
+      padding: 1vh 2vw;
+      font-size: clamp(10px, 2.8vw, 12px);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: transparent;
+      font-family: 'Segoe UI', sans-serif;
+      outline: none;
+    }
+
+    .mobile-search-input::placeholder {
+      color: #666;
+      opacity: 0.8;
+    }
+
+    .mobile-search-input:focus {
+      border-color: #3182bd;
+    }
+
+    .no-results-message {
+      text-align: center;
+      color: #666;
+      font-size: clamp(11px, 3vw, 13px);
+      padding: 2vh 1vw;
+      line-height: 1.4;
     }
     
     .mobile-content {
-      height: 75%;
+      flex: 1;
+      height: 80%;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -181,26 +216,26 @@
     }
     
     .pagination {
-      height: 13%;
+      height: 8%;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 4vw;
       flex-shrink: 0;
-      padding-top: 1vh;
+      padding: 1vh 0;
       border-top: 1px solid #eee;
       box-sizing: border-box;
     }
     
     .pagination button {
-      padding: 2vh 4vw;
+      padding: 1vh 3vw;
       border: 1px solid #ccc;
       background: white;
       border-radius: 4px;
       cursor: pointer;
-      font-size: clamp(12px, 3.5vw, 14px);
+      font-size: clamp(11px, 3vw, 13px);
       min-width: 15vw;
-      min-height: 8vh;
+      min-height: 4vh;
       touch-action: manipulation;
     }
     
@@ -241,6 +276,17 @@
         padding-top: 5%;
         padding-bottom: 1.5%;
         font-size: clamp(13px, 4.2vw, 17px);
+      }
+
+      .mobile-header-title {
+        font-size: clamp(13px, 4.2vw, 17px);
+      }
+
+      .mobile-search-input {
+        width: 28vw;
+        max-width: 100px;
+        padding: 0.8vh 1.5vw;
+        font-size: clamp(9px, 2.5vw, 11px);
       }
       
       .mobile-content {
@@ -299,13 +345,17 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      border: none;
     }
     th, td {
-      border: 1px solid #ccc;
+      border: none;
       padding: 6px 8px;
       text-align: left;
       font-size: 14px;  /* Slightly smaller font size */
       white-space: nowrap;  /* Prevent text wrapping */
+    }
+    th {
+      border-bottom: 1px solid #ccc;
     }
     button#closeModal {
       position: absolute;
@@ -333,7 +383,7 @@
       background: transparent;
       box-shadow: none;
       border-radius: 5px;
-      font-family: Arial, sans-serif;
+      font-family:  'Segoe UI' sans-serif;  /* Changed to Georgia font */
       margin: 0 auto 10px auto;  /* Changed margin to center horizontally */
       width: 300px;
       display: block;  /* Added to ensure centering works */
@@ -393,15 +443,51 @@
       outline: none;
       border-color: #3182bd;
     }
+
+    /* Desktop modal header and search styles */
+    .desktop-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1em;
+    }
+
+    .desktop-search-input {
+      width: 200px;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: transparent;
+      font-family: 'Segoe UI', sans-serif;
+      outline: none;
+    }
+
+    .desktop-search-input::placeholder {
+      color: #666;
+      opacity: 0.8;
+    }
+
+    .desktop-search-input:focus {
+      border-color: #3182bd;
+    }
+
+    .no-results-desktop {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      padding: 20px;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
-    <h1 style="text-align: center; font-family: Arial, sans-serif; margin: 1em 0;">
+    <h2 style="text-align: center; font-family:  'Segoe UI' sans-serif; margin: 1em 0;">
     Map of SEA founders in the US
-    </h1>
-    <h3 style="text-align: center; font-family: Arial, sans-serif; font-weight: normal; margin: 1em 0;">
+    </h2>
+    <h4 style="text-align: center; font-family: Georgia, Georgia; font-weight: normal; margin: 1em 0;">
     Select a state from dropdown menu or click on the map see details list
-    </h3>
+    </h4>
 
     <div class="state-selector">
       <select id="stateSelect" aria-label="Select a state">
@@ -603,26 +689,53 @@
     let currentPage = 1;
     let foundersPerPage = 3;
     let currentFounders = [];
+    let filteredFounders = [];
+    let currentSearchTerm = '';
+    let desktopSearchTerm = '';
+    let desktopFilteredFounders = [];
 
     function isMobile() {
       return window.innerWidth < 600;
     }
 
-    function showModal(state) {
-      const list = stateData[state] || [];
-      currentFounders = list;
-      currentPage = 1;
-      
-      if (isMobile()) {
-        showMobileModal(state, list);
-      } else {
-        showDesktopModal(state, list);
+    function searchFounders(searchTerm, founders) {
+      if (!searchTerm.trim()) {
+        return founders;
       }
+      
+      const term = searchTerm.toLowerCase();
+      return founders.filter(founder => {
+        return (
+          founder.founder.toLowerCase().includes(term) ||
+          founder.company.toLowerCase().includes(term) ||
+          founder.com_city.toLowerCase().includes(term) ||
+          founder.com_year.toString().includes(term) ||
+          founder.com_industry.toLowerCase().includes(term) ||
+          founder.origin.toLowerCase().includes(term)
+        );
+      });
     }
 
-    function showDesktopModal(state, list) {
-      let html = `<h3>${state}: ${list.length} SEA founders</h3>`;
-      html += `<table>
+    function handleDesktopSearch(searchTerm, state) {
+      desktopSearchTerm = searchTerm;
+      desktopFilteredFounders = searchFounders(searchTerm, currentFounders);
+      renderDesktopTable(state, desktopFilteredFounders);
+    }
+
+    function renderDesktopTable(state, foundersToShow) {
+      const tableContainer = document.getElementById('desktop-table-container');
+      if (!tableContainer) return;
+
+      if (foundersToShow.length === 0) {
+        tableContainer.innerHTML = `
+          <div class="no-results-desktop">
+            Please try again with exact name of founder, company, year founded, industry or country of origin
+          </div>
+        `;
+        return;
+      }
+
+      let html = `<table>
         <thead><tr>
           <th>Founder</th>
           <th>City</th>
@@ -631,7 +744,8 @@
           <th>Industry</th>
           <th>Country of Origin</th>
         </tr></thead><tbody>`;
-      list.forEach(d => {
+      
+      foundersToShow.forEach(d => {
         // Convert Markdown links for founder and company
         let founderHtml = d.founder.replace(
           /\[([^\]]+)\]\(([^)]+)\)/g,
@@ -653,21 +767,23 @@
           </tr>`;
       });
       html += `</tbody></table>`;
-      content.innerHTML = html;
-      modal.showModal();
+      tableContainer.innerHTML = html;
     }
 
-    function showMobileModal(state, list) {
-      const totalPages = Math.ceil(list.length / foundersPerPage);
+    function renderMobileCards(state, foundersToShow) {
+      const totalPages = Math.ceil(foundersToShow.length / foundersPerPage);
       const startIndex = (currentPage - 1) * foundersPerPage;
       const endIndex = startIndex + foundersPerPage;
-      const currentPageFounders = list.slice(startIndex, endIndex);
+      const currentPageFounders = foundersToShow.slice(startIndex, endIndex);
 
-      let html = `<div class="mobile-layout">`;
-      html += `<div class="mobile-header">${state}: ${list.length} SEA founders</div>`;
-      html += `<div class="mobile-content">`;
-      html += `<div class="cards-container">`;
-      
+      // Update header title count
+      const headerTitle = document.querySelector('.mobile-header-title');
+      if (headerTitle) {
+        headerTitle.textContent = `${state}: ${foundersToShow.length} SEA founders`;
+      }
+
+      // Generate cards HTML
+      let cardsHtml = '';
       currentPageFounders.forEach((d, index) => {
         // Convert Markdown links for founder and company
         let founderHtml = d.founder.replace(
@@ -679,7 +795,7 @@
           '<a href="$2" target="_blank">$1</a>'
         );
 
-        html += `<div class="founder-card">
+        cardsHtml += `<div class="founder-card">
           <div class="card-row">
             <div class="card-left">
               <div class="card-label">Founder</div>
@@ -713,31 +829,125 @@
         </div>`;
       });
 
-      html += `</div>`; // close cards-container
+      // Update cards container
+      const cardsContainer = document.querySelector('.cards-container');
+      if (cardsContainer) {
+        cardsContainer.innerHTML = cardsHtml;
+      }
 
-      // Add pagination if needed
+      // Update pagination
+      const existingPagination = document.querySelector('.pagination');
+      if (existingPagination) {
+        existingPagination.remove();
+      }
+
       if (totalPages > 1) {
-        html += `<div class="pagination">
+        const mobileContent = document.querySelector('.mobile-content');
+        const paginationHtml = `<div class="pagination">
           <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>Back</button>
           <span class="page-info">${currentPage}/${totalPages}</span>
           <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
         </div>`;
+        
+        if (mobileContent) {
+          mobileContent.insertAdjacentHTML('beforeend', paginationHtml);
+        }
       }
+    }
 
-      html += `</div>`; // close mobile-content
-      html += `</div>`; // close mobile-layout
+    function isMobile() {
+      return window.innerWidth < 600;
+    }
+
+    function showModal(state) {
+      const list = stateData[state] || [];
+      currentFounders = list;
+      currentPage = 1;
+      
+      // Reset search states when opening a new modal
+      currentSearchTerm = '';
+      desktopSearchTerm = '';
+      filteredFounders = list;
+      desktopFilteredFounders = list;
+      
+      if (isMobile()) {
+        showMobileModal(state, list);
+      } else {
+        showDesktopModal(state, list);
+      }
+    }
+
+    function showDesktopModal(state, list) {
+      // Reset desktop search state
+      currentFounders = list;
+      desktopSearchTerm = '';
+      desktopFilteredFounders = list;
+      
+      // Create header with search input
+      let html = `<div class="desktop-modal-header">
+        <h3>${state}: ${list.length} SEA founders</h3>
+        <input type="text" class="desktop-search-input" placeholder="Search" 
+               oninput="handleDesktopSearch(this.value, '${state}')" value="">
+      </div>`;
+      
+      // Add table container
+      html += `<div id="desktop-table-container"></div>`;
+      
       content.innerHTML = html;
       modal.showModal();
+      
+      // Populate the table with initial data
+      renderDesktopTable(state, desktopFilteredFounders);
+    }
+
+    function showMobileModal(state, list) {
+      // Set global variables for current data
+      currentFounders = list;
+      filteredFounders = list; // Initialize with all founders
+      currentPage = 1; // Reset page when opening modal
+      currentSearchTerm = ''; // Reset search term
+      
+      // Create the initial modal structure (only once)
+      let html = `<div class="mobile-layout">`;
+      html += `<div class="mobile-header">
+        <div class="mobile-header-title">${state}: ${list.length} SEA founders</div>
+        <input type="text" class="mobile-search-input" placeholder="Search..." value="" 
+               oninput="handleSearchInput(this.value, '${state}')">
+      </div>`;
+      html += `<div class="mobile-content">`;
+      html += `<div class="cards-container">`;
+      html += `</div>`; // close cards-container - will be populated by renderMobileCards
+      html += `</div>`; // close mobile-content
+      html += `</div>`; // close mobile-layout
+      
+      content.innerHTML = html;
+      modal.showModal();
+      
+      // Now populate the dynamic content
+      renderMobileCards(state, filteredFounders);
+    }
+
+    function handleSearchInput(searchTerm, state) {
+      currentSearchTerm = searchTerm;
+      filteredFounders = searchFounders(searchTerm, currentFounders);
+      currentPage = 1; // Reset to first page when searching
+      
+      // Only update the dynamic content, not the entire modal
+      renderMobileCards(state, filteredFounders);
     }
 
     function changePage(direction) {
-      const totalPages = Math.ceil(currentFounders.length / foundersPerPage);
+      const totalPages = Math.ceil(filteredFounders.length / foundersPerPage);
       const newPage = currentPage + direction;
       
       if (newPage >= 1 && newPage <= totalPages) {
         currentPage = newPage;
-        const state = Object.keys(stateData).find(key => stateData[key] === currentFounders);
-        showMobileModal(state || 'Unknown', currentFounders);
+        // Get current state name from the modal header
+        const headerElement = document.querySelector('.mobile-header-title');
+        const stateName = headerElement ? headerElement.textContent.split(':')[0] : 'Unknown';
+        
+        // Only update the dynamic content, not the entire modal
+        renderMobileCards(stateName, filteredFounders);
       }
     }
 
