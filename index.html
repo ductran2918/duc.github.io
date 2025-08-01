@@ -13,26 +13,29 @@
   />
 
   <style>
-    /* Full‑width map */
+    :root {
+      --main-font: 'Lato', sans-serif;
+    }
+
+    /* Compact content layout */
     html, body {
-      height: 100%;
       margin: 0;
       padding: 0;
     }
 
     body {
-      display: flex;
-      flex-direction: column;
+      font-family: var(--main-font);
+      line-height: 1.4;
     }
     h1 {
       text-align: center;
-      font-family: 'Segoe UI' sans-serif;
-      margin: 1em 0 0.25em;
+      font-family: var(--main-font);
+      margin: 0.25em 0;
     }
 
     #map {
       width: 100%;
-      height: 65vh;  /* Changed from fixed 450px to responsive 65vh */
+      height: 450px;  /* Fixed height instead of viewport-based */
       margin: 0;
       background-color: transparent;
     }
@@ -45,7 +48,7 @@
       border-radius: 5px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
       padding: 1em;
-      font-family: 'Segoe UI' sans-serif;
+      font-family: var(--main-font);
     }
 
     /* Mobile-specific modal styles */
@@ -123,7 +126,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       background: transparent;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: var(--main-font);
       outline: none;
     }
 
@@ -383,12 +386,12 @@
       background: transparent;
       box-shadow: none;
       border-radius: 5px;
-      font-family:  'Segoe UI' sans-serif;  /* Changed to Georgia font */
-      margin: 0 auto 10px auto;  /* Changed margin to center horizontally */
+      font-family: var(--main-font);
+      margin: 0 auto 0.25em auto;  /* Minimal margin for compact layout */
       width: 300px;
-      display: block;  /* Added to ensure centering works */
-      position: relative;  /* Added for positioning context */
-      text-align: center;  /* Center the text content */
+      display: block;
+      position: relative;
+      text-align: center;
     }
     .legend-bar {
       height: 20px;
@@ -416,7 +419,7 @@
 
     .state-selector {
       text-align: center;
-      margin: 1em 0;
+      margin: 0.25em 0;  /* Compact margin */
     }
     .state-selector select {
       padding: 0.5em;
@@ -459,7 +462,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       background: transparent;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: var(--main-font);
       outline: none;
     }
 
@@ -479,14 +482,52 @@
       padding: 20px;
       font-style: italic;
     }
+
+    /* Map footer elements */
+    .map-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.25em 0;
+      padding: 0 8px;
+    }
+
+    .source-attribution {
+      font-family: var(--main-font);
+      font-size: 12px;
+      color: #666;
+      text-align: left;
+    }
+
+    .watermark-image {
+      height: 20px;
+      width: auto;
+    }
+
+    /* Mobile responsiveness for map footer */
+    @media (max-width: 600px) {
+      .map-footer {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25em;
+      }
+      
+      .source-attribution {
+        text-align: center;
+      }
+      
+      #map {
+        height: 350px;  /* Slightly smaller on mobile */
+      }
+    }
   </style>
 </head>
 <body>
-    <h2 style="text-align: center; font-family:  'Segoe UI' sans-serif; margin: 1em 0;">
+    <h2 style="text-align: center; font-family: var(--main-font); margin: 0.5em 0 0.25em 0;">
     Map of SEA founders in the US
     </h2>
-    <h4 style="text-align: center; font-family: Georgia, Georgia; font-weight: normal; margin: 1em 0;">
-    Select a state from dropdown menu or click on the map to see the details list
+    <h4 style="text-align: center; font-family: var(--main-font); font-weight: normal; margin: 0.25em 0;">
+    Select a state from dropdown menu or click on the map see details list
     </h4>
 
     <div class="state-selector">
@@ -497,6 +538,11 @@
 
   <div class="legend" id="legend"></div>
   <div id="map"></div>
+  
+  <div class="map-footer">
+    <div class="source-attribution">Source: Tech in Asia research</div>
+    <img src="https://public.flourish.studio/uploads/654906/b7663fa8-c232-432e-838d-274566bd6992.png" alt="Watermark" class="watermark-image">
+  </div>
 
   <dialog id="detailModal">
     <button id="closeModal">✕</button>  <!-- Changed from "Close" to "✕" -->
@@ -632,7 +678,7 @@
           function populateStateDropdown(geojson) {
             const select = document.getElementById('stateSelect');
             
-            // Create array of state objects with their founder counts
+            // Create array of state objects with their founder counts - only include states with founders
             const states = geojson.features
               .filter(f => !["Alaska", "Hawaii", "Puerto Rico"].includes(f.properties.name))
               .map(f => {
@@ -641,19 +687,16 @@
                 return {
                   name: name,
                   count: count,
-                  display: count > 0 ? `${name}: ${count} founders` : `${name}: N/A`
+                  display: `${name}: ${count} founders`
                 };
               })
-              // Sort by count in descending order, putting N/A states at the bottom
-              .sort((a, b) => {
-                if (a.count === 0 && b.count === 0) return a.name.localeCompare(b.name);
-                if (a.count === 0) return 1;
-                if (b.count === 0) return -1;
-                return b.count - a.count;
-              });
+              // Filter to only include states with founders (count > 0)
+              .filter(state => state.count > 0)
+              // Sort by count in descending order
+              .sort((a, b) => b.count - a.count);
 
-            // Update default option
-            select.querySelector('option').textContent = 'Select a state...';
+            // Clear existing options except the placeholder
+            select.innerHTML = '<option value="">Select a state...</option>';
 
             // Add state options
             states.forEach(state => {
@@ -668,8 +711,17 @@
               const selectedState = e.target.value;
               if (selectedState && stateData[selectedState]?.length > 0) {
                 showModal(selectedState);
+                // Reset dropdown after selection
+                resetDropdown();
               }
             });
+          }
+
+          function resetDropdown() {
+            const select = document.getElementById('stateSelect');
+            if (select) {
+              select.value = '';
+            }
           }
 
           // Add this line in your .then() block after creating the L.geoJson layer
@@ -684,7 +736,10 @@
     // 5. Modal logic - Keep only this one showModal function
     const modal = document.getElementById("detailModal");
     const content = document.getElementById("modalContent");
-    document.getElementById("closeModal").onclick = () => modal.close();
+    document.getElementById("closeModal").onclick = () => {
+      modal.close();
+      resetDropdown();
+    };
 
     let currentPage = 1;
     let foundersPerPage = 3;
@@ -693,6 +748,13 @@
     let currentSearchTerm = '';
     let desktopSearchTerm = '';
     let desktopFilteredFounders = [];
+
+    function resetDropdown() {
+      const select = document.getElementById('stateSelect');
+      if (select) {
+        select.value = '';
+      }
+    }
 
     function isMobile() {
       return window.innerWidth < 600;
@@ -960,6 +1022,11 @@
           showModal(state);
         }
       }
+    });
+
+    // Add modal close listener to reset dropdown
+    modal.addEventListener('close', () => {
+      resetDropdown();
     });
   </script>
 </body>
