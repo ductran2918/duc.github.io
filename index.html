@@ -1141,10 +1141,42 @@
       }, 250); // 250ms delay to avoid excessive updates
     });
 
-    // Add modal close listener to reset dropdown
+    // ADD THE NEW CODE HERE - Parent iframe communication
+    function notifyParentOfSize() {
+      const height = Math.max(
+        document.body.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.clientHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight
+      );
+      
+      // Send resize message to parent
+      if (window.parent !== window) {
+        window.parent.postMessage({
+          type: 'resize',
+          height: height
+        }, '*');
+      }
+    }
+
+    // Call on load and when content changes
+    window.addEventListener('load', notifyParentOfSize);
+    window.addEventListener('resize', notifyParentOfSize);
+
+    // Call when modal opens/closes (since it changes content height)
+    const originalShowModal = showModal;
+    window.showModal = function(state) {
+      originalShowModal(state);
+      setTimeout(notifyParentOfSize, 100); // Small delay to ensure modal is rendered
+    };
+
     modal.addEventListener('close', () => {
       resetDropdown();
+      setTimeout(notifyParentOfSize, 100); // Notify parent when modal closes
     });
+
+    // END OF NEW CODE
   </script>
 </body>
 </html>
