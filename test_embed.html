@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SEA Founders Embed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .embed-container {
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Testing SEA Founders Map Embed</h1>
+        
+        <p>This page tests if your embed script works correctly before using it in your CMS.</p>
+        
+        <div class="embed-container">
+            <!-- Your embed script -->
+            <div class="github-embed" 
+                 data-src=""
+                 data-aspect-ratio="16:9"
+                 data-min-height="450">
+                <script src="https://ductran2918.github.io/seafounders_us/embed.js"></script>
+                <noscript>
+                    <div style="text-align: center; padding: 40px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; color: #495057;">
+                        <h3 style="margin: 0 0 15px 0; font-size: 18px;">📊 Interactive SEA Founders Map</h3>
+                        <p style="margin: 0 0 20px 0;">This interactive visualization shows the distribution of Southeast Asian founders across US states.</p>
+                        <a href="https://ductran2918.github.io/seafounders_us/" 
+                           target="_blank" 
+                           style="display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; font-weight: 500;">
+                            View Interactive Map →
+                        </a>
+                    </div>
+                </noscript>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: #e3f2fd; border-radius: 6px;">
+            <h3>✅ What should happen:</h3>
+            <ul>
+                <li>You should see your interactive map embedded above</li>
+                <li>It should be responsive and properly sized</li>
+                <li>All interactions (dropdown, clicking states) should work</li>
+                <li>It should look the same as your original page</li>
+            </ul>
+            
+            <h3>🐛 If it doesn't work:</h3>
+            <ul>
+                <li>Open browser developer tools (F12)</li>
+                <li>Check the Console tab for error messages</li>
+                <li>Make sure the BASE_URL in embed.js is correct</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
