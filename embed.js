@@ -3,7 +3,7 @@
     'use strict';
     
     // Configuration
-    const BASE_URL = 'https://yourusername.github.io/your-repo-name'; // Replace with your GitHub Pages URL
+    const BASE_URL = 'https://ductran2918.github.io/seafounders_us';
     
     // Find all embed containers
     function initializeEmbeds() {
