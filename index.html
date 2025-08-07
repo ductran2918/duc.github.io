@@ -1178,5 +1178,19 @@
 
     // END OF NEW CODE
   </script>
+  <script>
+  // === auto-send the page’s current height to the parent ===
+  function sendHeight () {
+    const h = document.documentElement.scrollHeight;
+    parent.postMessage({ embedId: 'sea-founders-map', height: h }, '*');
+  }
+
+  // initial + on resize
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+
+  // keep watching in case Leaflet changes size after data loads
+  new ResizeObserver(sendHeight).observe(document.body);
+</script>
 </body>
 </html>
